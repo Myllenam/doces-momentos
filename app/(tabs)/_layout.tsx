@@ -2,9 +2,11 @@ import { Tabs } from "expo-router";
 import { SymbolView } from "expo-symbols";
 
 import Colors from "@/constants/Colors";
+import { useStore } from "@/src/contexts/StoreContext";
 
 export default function TabLayout() {
   const colors = Colors.light;
+  const { cartCount } = useStore();
 
   return (
     <Tabs
@@ -62,6 +64,11 @@ export default function TabLayout() {
         name="carrinho"
         options={{
           title: "Carrinho",
+          tabBarBadge: cartCount > 0 ? cartCount : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: colors.primaryDark,
+            color: colors.card,
+          },
           tabBarIcon: ({ color }) => (
             <SymbolView
               name={{

@@ -7,6 +7,7 @@ import { ProductsProvider } from '@/src/context/ProductsContext';
 import "react-native-reanimated";
 
 import Colors from "@/constants/Colors";
+import { StoreProvider } from "@/src/contexts/StoreContext";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -46,6 +47,7 @@ export default function RootLayout() {
 
   return (
 <ThemeProvider value={AppTheme}>
+  <StoreProvider>
     <ProductsProvider>
       <Stack>
         <Stack.Screen
@@ -66,6 +68,8 @@ export default function RootLayout() {
         />
       </Stack>
     </ProductsProvider>
+    </StoreProvider>
   </ThemeProvider>
+ 
   );
 }
