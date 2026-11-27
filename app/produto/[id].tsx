@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
 import {
-  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -19,6 +18,7 @@ import {
   Spacing,
 } from '@/constants/Theme';
 import { buscarProdutoPorId } from '@/src/data/produtos';
+import { useStore } from '@/src/contexts/StoreContext';
 
 const colors = Colors.light;
 
@@ -27,7 +27,9 @@ export default function ProductDetailsScreen() {
 
   const product = buscarProdutoPorId(id);
   const [quantity, setQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [cartNotice, setCartNotice] = useState('');
+  const { addToCart, toggleFavorite, isFavorite } = useStore();
+  const favorited = product ? isFavorite(product.id) : false;
 
   const formatPrice = (value: number) =>
     value.toLocaleString('pt-BR', {
@@ -65,16 +67,14 @@ export default function ProductDetailsScreen() {
   };
 
   const handleAddToCart = () => {
-    // TODO: Integrar com CartContext.
-    Alert.alert(
-      'Carrinho',
-      `${quantity} unidade(s) de ${product.nome} selecionada(s).`,
+    addToCart(product.id, quantity);
+    setCartNotice(
+      `${quantity} ${quantity === 1 ? 'unidade adicionada' : 'unidades adicionadas'} ao carrinho.`,
     );
   };
 
   const handleToggleFavorite = () => {
-    // TODO: Integrar com FavoritesContext.
-    setIsFavorite((current) => !current);
+    toggleFavorite(product.id);
   };
 
   return (
@@ -114,15 +114,15 @@ export default function ProductDetailsScreen() {
               style={styles.favoriteButton}
               accessibilityRole="button"
               accessibilityLabel={
-                isFavorite
+                favorited
                   ? 'Remover dos favoritos'
                   : 'Adicionar aos favoritos'
               }
             >
               <SymbolView
                 name={{
-                  ios: isFavorite ? 'heart.fill' : 'heart',
-                  android: isFavorite
+                  ios: favorited ? 'heart.fill' : 'heart',
+                  android: favorited
                     ? 'favorite'
                     : 'favorite_border',
                   web: 'favorite',
@@ -213,6 +213,18 @@ export default function ProductDetailsScreen() {
             Adicionar ao carrinho
           </Text>
         </Pressable>
+
+        {cartNotice ? (
+          <View style={styles.cartNotice} accessibilityLiveRegion="polite">
+            <Text style={styles.cartNoticeText}>✓ {cartNotice}</Text>
+            <Pressable
+              onPress={() => router.navigate('/(tabs)/carrinho')}
+              accessibilityRole="button"
+            >
+              <Text style={styles.cartNoticeLink}>Ver carrinho</Text>
+            </Pressable>
+          </View>
+        ) : null}
       </View>
     </View>
   );
@@ -363,6 +375,27 @@ const styles = StyleSheet.create({
     color: colors.card,
     fontSize: FontSize.md,
     fontWeight: '700',
+  },
+  cartNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    backgroundColor: colors.secondary,
+  },
+  cartNoticeText: {
+    flex: 1,
+    color: colors.text,
+    fontSize: FontSize.sm,
+    fontWeight: '600',
+  },
+  cartNoticeLink: {
+    color: colors.primaryDark,
+    fontSize: FontSize.sm,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
   emptyContainer: {
     flex: 1,

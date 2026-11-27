@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 
 import Colors from "@/constants/Colors";
+import { StoreProvider } from "@/src/contexts/StoreContext";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -45,21 +46,23 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={AppTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <StoreProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        <Stack.Screen
-          name="produto/[id]"
-          options={{
-            title: "Detalhes do doce",
-            headerBackTitle: "Voltar",
-            headerTintColor: Colors.light.primaryDark,
-            headerStyle: {
-              backgroundColor: Colors.light.background,
-            },
-          }}
-        />
-      </Stack>
+          <Stack.Screen
+            name="produto/[id]"
+            options={{
+              title: "Detalhes do doce",
+              headerBackTitle: "Voltar",
+              headerTintColor: Colors.light.primaryDark,
+              headerStyle: {
+                backgroundColor: Colors.light.background,
+              },
+            }}
+          />
+        </Stack>
+      </StoreProvider>
     </ThemeProvider>
   );
 }
