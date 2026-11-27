@@ -3,6 +3,7 @@ import { useFonts } from "expo-font";
 import { Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { ProductsProvider } from '@/src/context/ProductsContext';
 import "react-native-reanimated";
 
 import Colors from "@/constants/Colors";
@@ -44,15 +45,19 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={AppTheme}>
+<ThemeProvider value={AppTheme}>
+    <ProductsProvider>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="(tabs)"
+          options={{ headerShown: false }}
+        />
 
         <Stack.Screen
           name="produto/[id]"
           options={{
-            title: "Detalhes do doce",
-            headerBackTitle: "Voltar",
+            title: 'Detalhes do doce',
+            headerBackTitle: 'Voltar',
             headerTintColor: Colors.light.primaryDark,
             headerStyle: {
               backgroundColor: Colors.light.background,
@@ -60,6 +65,7 @@ export default function RootLayout() {
           }}
         />
       </Stack>
-    </ThemeProvider>
+    </ProductsProvider>
+  </ThemeProvider>
   );
 }

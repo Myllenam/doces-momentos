@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Pressable,
@@ -14,14 +15,15 @@ import { SymbolView } from "expo-symbols";
 
 import Colors from "@/constants/Colors";
 import { BorderRadius, FontSize, Spacing } from "@/constants/Theme";
-import { buscarProdutoPorId } from "@/src/data/produtos";
+import { useProducts } from "@/src/context/ProductsContext";
 
 const colors = Colors.light;
 
 export default function ProductDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const product = buscarProdutoPorId(id);
+  const { getProductById, loading } = useProducts();
+  const product = getProductById(id);
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -30,6 +32,16 @@ export default function ProductDetailsScreen() {
       style: "currency",
       currency: "BRL",
     });
+
+  if (!product && loading) {
+    return (
+      <View style={styles.emptyContainer}>
+        <ActivityIndicator size="large" color={colors.primaryDark} />
+
+        <Text style={styles.emptyTitle}>Carregando doce...</Text>
+      </View>
+    );
+  }
 
   if (!product) {
     return (
