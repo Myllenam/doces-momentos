@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Alert,
   Image,
@@ -8,17 +7,14 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
+} from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { router, useLocalSearchParams } from "expo-router";
+import { SymbolView } from "expo-symbols";
 
-import Colors from '@/constants/Colors';
-import {
-  BorderRadius,
-  FontSize,
-  Spacing,
-} from '@/constants/Theme';
-import { buscarProdutoPorId } from '@/src/data/produtos';
+import Colors from "@/constants/Colors";
+import { BorderRadius, FontSize, Spacing } from "@/constants/Theme";
+import { buscarProdutoPorId } from "@/src/data/produtos";
 
 const colors = Colors.light;
 
@@ -30,9 +26,9 @@ export default function ProductDetailsScreen() {
   const [isFavorite, setIsFavorite] = useState(false);
 
   const formatPrice = (value: number) =>
-    value.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
+    value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     });
 
   if (!product) {
@@ -40,14 +36,9 @@ export default function ProductDetailsScreen() {
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyEmoji}>🧁</Text>
 
-        <Text style={styles.emptyTitle}>
-          Produto não encontrado
-        </Text>
+        <Text style={styles.emptyTitle}>Produto não encontrado</Text>
 
-        <Pressable
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
+        <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backButtonText}>Voltar</Text>
         </Pressable>
       </View>
@@ -67,7 +58,7 @@ export default function ProductDetailsScreen() {
   const handleAddToCart = () => {
     // TODO: Integrar com CartContext.
     Alert.alert(
-      'Carrinho',
+      "Carrinho",
       `${quantity} unidade(s) de ${product.nome} selecionada(s).`,
     );
   };
@@ -91,9 +82,7 @@ export default function ProductDetailsScreen() {
               resizeMode="cover"
             />
           ) : (
-            <Text style={styles.productEmoji}>
-              {product.emoji}
-            </Text>
+            <Text style={styles.productEmoji}>{product.emoji}</Text>
           )}
         </View>
 
@@ -104,9 +93,7 @@ export default function ProductDetailsScreen() {
                 {product.categoria.toUpperCase()}
               </Text>
 
-              <Text style={styles.title}>
-                {product.nome}
-              </Text>
+              <Text style={styles.title}>{product.nome}</Text>
             </View>
 
             <Pressable
@@ -114,45 +101,29 @@ export default function ProductDetailsScreen() {
               style={styles.favoriteButton}
               accessibilityRole="button"
               accessibilityLabel={
-                isFavorite
-                  ? 'Remover dos favoritos'
-                  : 'Adicionar aos favoritos'
+                isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"
               }
             >
-              <SymbolView
-                name={{
-                  ios: isFavorite ? 'heart.fill' : 'heart',
-                  android: isFavorite
-                    ? 'favorite'
-                    : 'favorite_border',
-                  web: 'favorite',
-                }}
-                tintColor={colors.primaryDark}
+              <Ionicons
+                name={isFavorite ? "heart" : "heart-outline"}
                 size={26}
+                color={colors.primaryDark}
               />
             </Pressable>
           </View>
 
-          <Text style={styles.price}>
-            {formatPrice(product.preco)}
-          </Text>
+          <Text style={styles.price}>{formatPrice(product.preco)}</Text>
 
           <View style={styles.divider} />
 
-          <Text style={styles.sectionTitle}>
-            Sobre esse doce
-          </Text>
+          <Text style={styles.sectionTitle}>Sobre esse doce</Text>
 
-          <Text style={styles.description}>
-            {product.descricao}
-          </Text>
+          <Text style={styles.description}>{product.descricao}</Text>
 
           <View style={styles.divider} />
 
           <View style={styles.quantityRow}>
-            <Text style={styles.sectionTitle}>
-              Quantidade
-            </Text>
+            <Text style={styles.sectionTitle}>Quantidade</Text>
 
             <View style={styles.quantityControl}>
               <Pressable
@@ -161,23 +132,17 @@ export default function ProductDetailsScreen() {
                 disabled={quantity === 1}
                 accessibilityLabel="Diminuir quantidade"
               >
-                <Text style={styles.quantityButtonText}>
-                  −
-                </Text>
+                <Text style={styles.quantityButtonText}>−</Text>
               </Pressable>
 
-              <Text style={styles.quantityText}>
-                {quantity}
-              </Text>
+              <Text style={styles.quantityText}>{quantity}</Text>
 
               <Pressable
                 style={styles.quantityButton}
                 onPress={increaseQuantity}
                 accessibilityLabel="Aumentar quantidade"
               >
-                <Text style={styles.quantityButtonText}>
-                  +
-                </Text>
+                <Text style={styles.quantityButtonText}>+</Text>
               </Pressable>
             </View>
           </View>
@@ -186,32 +151,23 @@ export default function ProductDetailsScreen() {
 
       <View style={styles.footer}>
         <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>
-            Total
-          </Text>
+          <Text style={styles.totalLabel}>Total</Text>
 
-          <Text style={styles.totalPrice}>
-            {formatPrice(total)}
-          </Text>
+          <Text style={styles.totalPrice}>{formatPrice(total)}</Text>
         </View>
 
-        <Pressable
-          style={styles.addButton}
-          onPress={handleAddToCart}
-        >
+        <Pressable style={styles.addButton} onPress={handleAddToCart}>
           <SymbolView
             name={{
-              ios: 'bag',
-              android: 'shopping_bag',
-              web: 'shopping_bag',
+              ios: "bag",
+              android: "shopping_bag",
+              web: "shopping_bag",
             }}
             tintColor={colors.card}
             size={21}
           />
 
-          <Text style={styles.addButtonText}>
-            Adicionar ao carrinho
-          </Text>
+          <Text style={styles.addButtonText}>Adicionar ao carrinho</Text>
         </Pressable>
       </View>
     </View>
@@ -227,15 +183,15 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xxl,
   },
   imageContainer: {
-    width: '100%',
+    width: "100%",
     height: 280,
     backgroundColor: colors.secondary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   productEmoji: {
     fontSize: 100,
@@ -244,9 +200,9 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
   },
   titleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     gap: Spacing.md,
   },
   productInfo: {
@@ -254,14 +210,14 @@ const styles = StyleSheet.create({
   },
   category: {
     fontSize: FontSize.xs,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.primaryDark,
     marginBottom: Spacing.sm,
     letterSpacing: 1,
   },
   title: {
     fontSize: FontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.text,
   },
   favoriteButton: {
@@ -269,14 +225,14 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: BorderRadius.full,
     backgroundColor: colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: colors.border,
   },
   price: {
     fontSize: FontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.primaryDark,
     marginTop: Spacing.md,
   },
@@ -287,7 +243,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: FontSize.lg,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.text,
   },
   description: {
@@ -297,13 +253,13 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
   },
   quantityRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   quantityControl: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: Spacing.lg,
   },
   quantityButton: {
@@ -313,20 +269,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   quantityButtonText: {
     fontSize: 23,
-    fontWeight: '600',
+    fontWeight: "600",
     color: colors.primaryDark,
   },
   quantityText: {
     fontSize: FontSize.lg,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.text,
     minWidth: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   footer: {
     padding: Spacing.lg,
@@ -337,9 +293,9 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   totalLabel: {
     fontSize: FontSize.md,
@@ -347,27 +303,27 @@ const styles = StyleSheet.create({
   },
   totalPrice: {
     fontSize: FontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.text,
   },
   addButton: {
     height: 54,
     backgroundColor: colors.primaryDark,
     borderRadius: BorderRadius.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: Spacing.sm,
   },
   addButtonText: {
     color: colors.card,
     fontSize: FontSize.md,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   emptyContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: Spacing.xl,
     backgroundColor: colors.background,
   },
@@ -376,7 +332,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: FontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.text,
     marginVertical: Spacing.xl,
   },
@@ -388,6 +344,6 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     color: colors.card,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });
