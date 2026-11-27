@@ -1,33 +1,143 @@
-import { StyleSheet, Text, View } from "react-native";
 
-import Colors from "@/constants/Colors";
-import { BorderRadius, FontSize, Spacing } from "@/constants/Theme";
+import { useMemo, useState } from 'react';
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { router } from 'expo-router';
+
+import Colors from '@/constants/Colors';
+import {
+  BorderRadius,
+  FontSize,
+  Spacing,
+} from '@/constants/Theme';
+import ProductCard from '@/src/components/ProductCard';
+import {
+  categorias,
+  produtos,
+  type CategoryFilter,
+} from '@/src/data/produtos';
 
 export default function HomeScreen() {
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryFilter>('Todos');
+
+  const filteredProducts = useMemo(() => {
+    const normalizedSearch = search.trim().toLocaleLowerCase('pt-BR');
+
+    return produtos.filter((product) => {
+      const matchesSearch = product.nome
+        .toLocaleLowerCase('pt-BR')
+        .includes(normalizedSearch);
+
+      const matchesCategory =
+        selectedCategory === 'Todos' ||
+        product.categoria === selectedCategory;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [search, selectedCategory]);
+
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.emoji}>🧁</Text>
+      <FlatList
+        data={filteredProducts}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.productRow}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Text style={styles.greeting}>
+              Feito com carinho 💗
+            </Text>
 
-        <Text style={styles.title}>Doces Momentos</Text>
+            <Text style={styles.title}>
+              Doces Momentos
+            </Text>
 
-        <Text style={styles.subtitle}>
-          Um docinho para deixar seu dia mais especial!
-        </Text>
+            <Text style={styles.subtitle}>
+              Um docinho para deixar seu dia mais especial!
+            </Text>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Bem-vindo à Doces Momentos!</Text>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Qual doce você procura?"
+              placeholderTextColor={Colors.light.muted}
+              value={search}
+              onChangeText={setSearch}
+              autoCorrect={false}
+              returnKeyType="search"
+            />
 
-          <Text style={styles.cardDescription}>
-            Aqui você encontrará doces feitos com muito carinho para adoçar seus
-            melhores momentos.
-          </Text>
+            <FlatList
+              horizontal
+              data={categorias}
+              keyExtractor={(item) => item}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.categories}
+              renderItem={({ item }) => {
+                const selected = selectedCategory === item;
 
-          <Text style={styles.comingSoon}>
-            🍰 Nosso catálogo estará aqui em breve!
-          </Text>
-        </View>
-      </View>
+                return (
+                  <Pressable
+                    onPress={() => setSelectedCategory(item)}
+                    style={[
+                      styles.categoryButton,
+                      selected && styles.categorySelected,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.categoryText,
+                        selected && styles.categoryTextSelected,
+                      ]}
+                    >
+                      {item}
+                    </Text>
+                  </Pressable>
+                );
+              }}
+            />
+
+            <Text style={styles.sectionTitle}>
+              Nossos docinhos 🍰
+            </Text>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.productColumn}>
+            <ProductCard
+              product={item}
+              onPress={() =>
+                router.push({
+                  pathname: '/produto/[id]',
+                  params: { id: item.id },
+                })
+              }
+            />
+          </View>
+        )}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyEmoji}>🧁</Text>
+            <Text style={styles.emptyTitle}>
+              Nenhum doce encontrado
+            </Text>
+            <Text style={styles.emptyText}>
+              Tente outra pesquisa ou categoria.
+            </Text>
+          </View>
+        }
+      />
     </View>
   );
 }
@@ -36,57 +146,98 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.light.background,
-    padding: Spacing.xl,
   },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+  listContent: {
+    padding: Spacing.lg,
+    paddingBottom: Spacing.xxl,
   },
-  emoji: {
-    fontSize: 64,
+  header: {
     marginBottom: Spacing.lg,
+  },
+  greeting: {
+    fontSize: FontSize.sm,
+    color: Colors.light.primaryDark,
+    fontWeight: '600',
+    marginBottom: Spacing.sm,
   },
   title: {
     fontSize: FontSize.xxl,
-    fontWeight: "700",
+    fontWeight: '700',
     color: Colors.light.text,
-    textAlign: "center",
   },
   subtitle: {
-    fontSize: FontSize.md,
+    fontSize: FontSize.sm,
     color: Colors.light.muted,
-    textAlign: "center",
     marginTop: Spacing.sm,
-    marginBottom: Spacing.xxl,
+    marginBottom: Spacing.xl,
   },
-  card: {
-    width: "100%",
+  searchInput: {
     backgroundColor: Colors.light.card,
-    borderRadius: BorderRadius.xl,
-    padding: Spacing.xl,
-    alignItems: "center",
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    borderColor: Colors.light.border,
+    paddingHorizontal: Spacing.lg,
+    height: 50,
+    fontSize: FontSize.md,
+    color: Colors.light.text,
+    marginBottom: Spacing.lg,
+  },
+  categories: {
+    gap: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
+  categoryButton: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.light.card,
     borderWidth: 1,
     borderColor: Colors.light.border,
   },
-  cardTitle: {
+  categorySelected: {
+    backgroundColor: Colors.light.primaryDark,
+    borderColor: Colors.light.primaryDark,
+  },
+  categoryText: {
+    fontSize: FontSize.sm,
+    color: Colors.light.text,
+    fontWeight: '500',
+  },
+  categoryTextSelected: {
+    color: Colors.light.card,
+    fontWeight: '700',
+  },
+  sectionTitle: {
     fontSize: FontSize.lg,
-    fontWeight: "700",
-    color: Colors.light.primaryDark,
-    textAlign: "center",
+    fontWeight: '700',
+    color: Colors.light.text,
+    marginTop: Spacing.xl,
+  },
+  productRow: {
+    gap: Spacing.md,
     marginBottom: Spacing.md,
   },
-  cardDescription: {
-    fontSize: FontSize.md,
-    color: Colors.light.text,
-    textAlign: "center",
-    lineHeight: 24,
+  productColumn: {
+    flex: 1,
+    minWidth: 0,
+    maxWidth: '50%',
   },
-  comingSoon: {
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: Spacing.xxl,
+    gap: Spacing.sm,
+  },
+  emptyEmoji: {
+    fontSize: 48,
+  },
+  emptyTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: '700',
+    color: Colors.light.text,
+  },
+  emptyText: {
     fontSize: FontSize.sm,
-    fontWeight: "600",
-    color: Colors.light.primaryDark,
-    textAlign: "center",
-    marginTop: Spacing.xl,
+    color: Colors.light.muted,
+    textAlign: 'center',
   },
 });
