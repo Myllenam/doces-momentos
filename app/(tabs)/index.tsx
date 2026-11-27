@@ -1,5 +1,6 @@
 
 import { useMemo, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   FlatList,
   Pressable,
@@ -45,12 +46,13 @@ export default function HomeScreen() {
   }, [search, selectedCategory]);
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={filteredProducts}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={styles.productRow}
+    <SafeAreaView style={styles.container} edges={['top']}>
+     
+        <FlatList
+          data={filteredProducts}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          columnWrapperStyle={styles.productRow}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -138,7 +140,7 @@ export default function HomeScreen() {
           </View>
         }
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
