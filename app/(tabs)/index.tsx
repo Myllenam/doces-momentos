@@ -15,7 +15,7 @@ import Colors from "@/constants/Colors";
 import { BorderRadius, FontSize, Spacing } from "@/constants/Theme";
 import ProductCard from "@/src/components/ProductCard";
 import { categorias, type CategoryFilter } from "@/src/data/produtos";
-import { useProducts } from "@/src/context/ProductsContext";
+import { useProducts } from "@/src/contexts/ProductsContext";
 
 export default function HomeScreen() {
   const [search, setSearch] = useState("");
