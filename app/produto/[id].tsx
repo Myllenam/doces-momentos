@@ -104,23 +104,17 @@ export default function ProductDetailsScreen() {
               onPress={handleToggleFavorite}
               style={styles.favoriteButton}
               accessibilityRole="button"
+              accessibilityState={{ selected: favorited }}
               accessibilityLabel={
                 favorited
                   ? 'Remover dos favoritos'
                   : 'Adicionar aos favoritos'
               }
             >
-              <SymbolView
-                name={{
-                  ios: favorited ? 'heart.fill' : 'heart',
-                  android: favorited
-                    ? 'favorite'
-                    : 'favorite_border',
-                  web: 'favorite',
-                }}
-                tintColor={colors.primaryDark}
+              <Ionicons
+                name={favorited ? 'heart' : 'heart-outline'}
+                color={favorited ? colors.error : colors.primaryDark}
                 size={26}
-                color={colors.primaryDark}
               />
             </Pressable>
           </View>
