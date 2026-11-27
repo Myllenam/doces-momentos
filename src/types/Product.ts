@@ -1,3 +1,4 @@
+import type { ImageSourcePropType } from 'react-native';
 
 export type ProductCategory =
   | 'Brigadeiros'
@@ -12,5 +13,5 @@ export interface Product {
   preco: number;
   categoria: ProductCategory;
   emoji: string;
-  imagem?: number;
+  imagem?: ImageSourcePropType;
 }

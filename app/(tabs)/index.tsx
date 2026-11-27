@@ -1,70 +1,62 @@
-
-import { useMemo, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useMemo, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
+  ActivityIndicator,
   FlatList,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
-} from 'react-native';
-import { router } from 'expo-router';
+} from "react-native";
+import { router } from "expo-router";
 
-import Colors from '@/constants/Colors';
-import {
-  BorderRadius,
-  FontSize,
-  Spacing,
-} from '@/constants/Theme';
-import ProductCard from '@/src/components/ProductCard';
-import {
-  categorias,
-  produtos,
-  type CategoryFilter,
-} from '@/src/data/produtos';
+import Colors from "@/constants/Colors";
+import { BorderRadius, FontSize, Spacing } from "@/constants/Theme";
+import ProductCard from "@/src/components/ProductCard";
+import { categorias, type CategoryFilter } from "@/src/data/produtos";
+import { useProducts } from "@/src/contexts/ProductsContext";
 
 export default function HomeScreen() {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] =
-    useState<CategoryFilter>('Todos');
+    useState<CategoryFilter>("Todos");
+  const { products, loading, refreshProducts } = useProducts();
 
   const filteredProducts = useMemo(() => {
-    const normalizedSearch = search.trim().toLocaleLowerCase('pt-BR');
+    const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
 
-    return produtos.filter((product) => {
+    return products.filter((product) => {
       const matchesSearch = product.nome
-        .toLocaleLowerCase('pt-BR')
+        .toLocaleLowerCase("pt-BR")
         .includes(normalizedSearch);
 
       const matchesCategory =
-        selectedCategory === 'Todos' ||
-        product.categoria === selectedCategory;
+        selectedCategory === "Todos" || product.categoria === selectedCategory;
 
       return matchesSearch && matchesCategory;
     });
-  }, [search, selectedCategory]);
+  }, [products, search, selectedCategory]);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-     
-        <FlatList
-          data={filteredProducts}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={styles.productRow}
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <FlatList
+        data={filteredProducts}
+        refreshing={loading}
+        onRefresh={() => {
+          void refreshProducts();
+        }}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.productRow}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={styles.greeting}>
-              Feito com carinho 💗
-            </Text>
+            <Text style={styles.greeting}>Feito com carinho 💗</Text>
 
-            <Text style={styles.title}>
-              Doces Momentos
-            </Text>
+            <Text style={styles.title}>Doces Momentos</Text>
 
             <Text style={styles.subtitle}>
               Um docinho para deixar seu dia mais especial!
@@ -110,9 +102,14 @@ export default function HomeScreen() {
               }}
             />
 
-            <Text style={styles.sectionTitle}>
-              Nossos docinhos 🍰
-            </Text>
+            <Text style={styles.sectionTitle}>Nossos docinhos 🍰</Text>
+            {loading && (
+              <ActivityIndicator
+                size="small"
+                color={Colors.light.primaryDark}
+                style={{ marginTop: Spacing.md }}
+              />
+            )}
           </View>
         }
         renderItem={({ item }) => (
@@ -121,7 +118,7 @@ export default function HomeScreen() {
               product={item}
               onPress={() =>
                 router.push({
-                  pathname: '/produto/[id]',
+                  pathname: "/produto/[id]",
                   params: { id: item.id },
                 })
               }
@@ -131,9 +128,7 @@ export default function HomeScreen() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyEmoji}>🧁</Text>
-            <Text style={styles.emptyTitle}>
-              Nenhum doce encontrado
-            </Text>
+            <Text style={styles.emptyTitle}>Nenhum doce encontrado</Text>
             <Text style={styles.emptyText}>
               Tente outra pesquisa ou categoria.
             </Text>
@@ -159,12 +154,12 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: FontSize.sm,
     color: Colors.light.primaryDark,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: Spacing.sm,
   },
   title: {
     fontSize: FontSize.xxl,
-    fontWeight: '700',
+    fontWeight: "700",
     color: Colors.light.text,
   },
   subtitle: {
@@ -203,15 +198,15 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: FontSize.sm,
     color: Colors.light.text,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   categoryTextSelected: {
     color: Colors.light.card,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   sectionTitle: {
     fontSize: FontSize.lg,
-    fontWeight: '700',
+    fontWeight: "700",
     color: Colors.light.text,
     marginTop: Spacing.xl,
   },
@@ -222,10 +217,10 @@ const styles = StyleSheet.create({
   productColumn: {
     flex: 1,
     minWidth: 0,
-    maxWidth: '50%',
+    maxWidth: "50%",
   },
   emptyContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: Spacing.xxl,
     gap: Spacing.sm,
   },
@@ -234,12 +229,12 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: FontSize.lg,
-    fontWeight: '700',
+    fontWeight: "700",
     color: Colors.light.text,
   },
   emptyText: {
     fontSize: FontSize.sm,
     color: Colors.light.muted,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

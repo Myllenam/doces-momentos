@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
@@ -7,27 +8,25 @@ import {
   Text,
   View,
 } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
 import { SymbolView } from "expo-symbols";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-import Colors from '@/constants/Colors';
-import {
-  BorderRadius,
-  FontSize,
-  Spacing,
-} from '@/constants/Theme';
-import { buscarProdutoPorId } from '@/src/data/produtos';
-import { useStore } from '@/src/contexts/StoreContext';
+import Colors from "@/constants/Colors";
+import { BorderRadius, FontSize, Spacing } from "@/constants/Theme";
+
+import { useProducts } from "@/src/contexts/ProductsContext";
+import { useStore } from "@/src/contexts/StoreContext";
 
 const colors = Colors.light;
 
 export default function ProductDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const product = buscarProdutoPorId(id);
+  const { getProductById, loading } = useProducts();
+  const product = getProductById(id);
   const [quantity, setQuantity] = useState(1);
-  const [cartNotice, setCartNotice] = useState('');
+  const [cartNotice, setCartNotice] = useState("");
   const { addToCart, toggleFavorite, isFavorite } = useStore();
   const favorited = product ? isFavorite(product.id) : false;
 
@@ -36,6 +35,16 @@ export default function ProductDetailsScreen() {
       style: "currency",
       currency: "BRL",
     });
+
+  if (!product && loading) {
+    return (
+      <View style={styles.emptyContainer}>
+        <ActivityIndicator size="large" color={colors.primaryDark} />
+
+        <Text style={styles.emptyTitle}>Carregando doce...</Text>
+      </View>
+    );
+  }
 
   if (!product) {
     return (
@@ -64,7 +73,7 @@ export default function ProductDetailsScreen() {
   const handleAddToCart = () => {
     addToCart(product.id, quantity);
     setCartNotice(
-      `${quantity} ${quantity === 1 ? 'unidade adicionada' : 'unidades adicionadas'} ao carrinho.`,
+      `${quantity} ${quantity === 1 ? "unidade adicionada" : "unidades adicionadas"} ao carrinho.`,
     );
   };
 
@@ -106,9 +115,7 @@ export default function ProductDetailsScreen() {
               accessibilityRole="button"
               accessibilityState={{ selected: favorited }}
               accessibilityLabel={
-                favorited
-                  ? 'Remover dos favoritos'
-                  : 'Adicionar aos favoritos'
+                favorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
               }
             >
               <Ionicons
@@ -181,7 +188,7 @@ export default function ProductDetailsScreen() {
           <View style={styles.cartNotice} accessibilityLiveRegion="polite">
             <Text style={styles.cartNoticeText}>✓ {cartNotice}</Text>
             <Pressable
-              onPress={() => router.navigate('/(tabs)/carrinho')}
+              onPress={() => router.navigate("/(tabs)/carrinho")}
               accessibilityRole="button"
             >
               <Text style={styles.cartNoticeLink}>Ver carrinho</Text>
@@ -337,12 +344,12 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: colors.card,
     fontSize: FontSize.md,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   cartNotice: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: Spacing.md,
     padding: Spacing.md,
     borderRadius: BorderRadius.md,
@@ -352,13 +359,13 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.text,
     fontSize: FontSize.sm,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   cartNoticeLink: {
     color: colors.primaryDark,
     fontSize: FontSize.sm,
-    fontWeight: '700',
-    textDecorationLine: 'underline',
+    fontWeight: "700",
+    textDecorationLine: "underline",
   },
   emptyContainer: {
     flex: 1,
