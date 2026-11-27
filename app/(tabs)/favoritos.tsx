@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Colors from '@/constants/Colors';
 import { BorderRadius, FontSize, Spacing } from '@/constants/Theme';
-import { produtos } from '@/src/data/produtos';
+import { useProducts } from '@/src/contexts/ProductsContext';
 import { useStore } from '@/src/contexts/StoreContext';
 
 const colors = Colors.light;
@@ -13,12 +13,17 @@ const formatPrice = (value: number) =>
 
 export default function FavoritesScreen() {
   const { favoriteIds, isReady, toggleFavorite } = useStore();
+  const { products, loading } = useProducts();
   const favorites = favoriteIds.flatMap((id) => {
-    const product = produtos.find((item) => item.id === id);
+    const product = products.find((item) => item.id === id);
     return product ? [product] : [];
   });
 
-  if (!isReady) {
+  const hasUnresolvedFavorites = favoriteIds.some(
+    (id) => !products.some((product) => product.id === id),
+  );
+
+  if (!isReady || (loading && hasUnresolvedFavorites)) {
     return <View style={styles.center}><Text style={styles.muted}>Carregando seus favoritos...</Text></View>;
   }
 

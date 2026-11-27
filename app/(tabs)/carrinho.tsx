@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Colors from '@/constants/Colors';
 import { BorderRadius, FontSize, Spacing } from '@/constants/Theme';
-import { produtos } from '@/src/data/produtos';
+import { useProducts } from '@/src/contexts/ProductsContext';
 import { useStore } from '@/src/contexts/StoreContext';
 
 const colors = Colors.light;
@@ -13,10 +13,14 @@ const formatPrice = (value: number) =>
 
 export default function CartScreen() {
   const { cart, isReady, updateCartQuantity, removeFromCart, clearCart } = useStore();
+  const { products, loading } = useProducts();
   const cartProducts = cart.flatMap((item) => {
-    const product = produtos.find((entry) => entry.id === item.productId);
+    const product = products.find((entry) => entry.id === item.productId);
     return product ? [{ product, quantity: item.quantity }] : [];
   });
+  const hasUnresolvedCartItems = cart.some(
+    (item) => !products.some((product) => product.id === item.productId),
+  );
   const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
   const total = cartProducts.reduce(
     (sum, item) => sum + item.product.preco * item.quantity,
@@ -31,7 +35,7 @@ export default function CartScreen() {
     );
   };
 
-  if (!isReady) {
+  if (!isReady || (loading && hasUnresolvedCartItems)) {
     return <View style={styles.center}><Text style={styles.muted}>Carregando seu carrinho...</Text></View>;
   }
 
